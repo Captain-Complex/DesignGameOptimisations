@@ -19,18 +19,33 @@
 *
 ********************************************************************************************/
 
+#include "Critter.h"
+
 #include "raylib.h"
 #include "raymath.h"
+
+#include <chrono>
+#include <ctime>
+#include <fstream>
+#include <iostream>
 #include <random>
-#include <time.h>
-#include "Critter.h"
+#include <vector>
+
+
 
 int main(int argc, char* argv[])
 {
+    using Timer = std::chrono::high_resolution_clock;
+
+    SetTraceLogLevel(LOG_ERROR);
+
+    /*Timer::time_point programStartTime = Timer::now();*/
+
+
     // Initialization
     //--------------------------------------------------------------------------------------
-    int screenWidth = 800;
-    int screenHeight = 450;
+    int screenWidth = 1280;
+    int screenHeight = 720;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
@@ -43,7 +58,7 @@ int main(int argc, char* argv[])
     Critter critters[1000]; 
 
     // create some critters
-    const int CRITTER_COUNT = 50;
+    const int CRITTER_COUNT = 1000;
     const int MAX_VELOCITY = 80;
 
     for (int i = 0; i < CRITTER_COUNT; i++)
@@ -69,9 +84,16 @@ int main(int argc, char* argv[])
     float timer = 1;
     Vector2 nextSpawnPos = destroyer.GetPosition();
 
+    std::vector<double> drawTimes;
+    std::vector<double> frameTimes;
+    std::vector<double> updateCritterTimes;
+    std::vector<double> collisionTimes;
+
+
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        Timer::time_point frameBegin = Timer::now();
         // Update
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
@@ -98,6 +120,8 @@ int main(int argc, char* argv[])
             destroyer.SetY(screenHeight);
             destroyer.SetVelocity(Vector2{ destroyer.GetVelocity().x, -destroyer.GetVelocity().y });
         }
+
+        Timer::time_point updateCritterBegin = Timer::now();
 
         // update the critters
         // (dirty flags will be cleared during update)
@@ -132,7 +156,14 @@ int main(int argc, char* argv[])
                 // this would be the perfect time to put the critter into an object pool
             }
         }
-                
+
+        Timer::time_point updateCritterEnd = Timer::now();
+        Timer::duration updateCritterTime = updateCritterEnd - updateCritterBegin;
+        std::chrono::duration<double, std::milli> milliUpdateCritter = updateCritterTime;
+        updateCritterTimes.push_back(milliUpdateCritter.count());
+
+        Timer::time_point collisionBegin = Timer::now();
+
         // check for critter-on-critter collisions
         for (int i = 0; i < CRITTER_COUNT; i++)
         {            
@@ -163,6 +194,11 @@ int main(int argc, char* argv[])
             }
         }
 
+        Timer::time_point collisionEnd = Timer::now();
+        Timer::duration collisionTime = collisionEnd - collisionBegin;
+        std::chrono::duration<double, std::milli> milliCollision = collisionTime;
+        collisionTimes.push_back(milliCollision.count());
+
         timer -= delta;
         if (timer <= 0)
         {
@@ -188,6 +224,7 @@ int main(int argc, char* argv[])
 
         // Draw
         //----------------------------------------------------------------------------------
+        Timer::time_point drawBegin = Timer::now();
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
@@ -206,7 +243,16 @@ int main(int argc, char* argv[])
         //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
 
         EndDrawing();
+        Timer::time_point drawEnd = Timer::now();
+        Timer::duration drawTime = drawEnd - drawBegin;
+        std::chrono::duration<double, std::milli> milliDraw = drawTime;
+        drawTimes.push_back(milliDraw.count());
+        /*std::cout << "Draw time: " << milliTime.count() << "\n";*/
         //----------------------------------------------------------------------------------
+        Timer::time_point frameEnd = Timer::now();
+        Timer::duration frameTime = frameEnd - frameBegin;
+        std::chrono::duration<double, std::milli> milliFrame = frameTime;
+        frameTimes.push_back(milliFrame.count());
     }
 
     for (int i = 0; i < CRITTER_COUNT; i++)
@@ -218,6 +264,37 @@ int main(int argc, char* argv[])
     //--------------------------------------------------------------------------------------   
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
+
+   /* Timer::time_point programEndTime = Timer::now();
+    Timer::duration programRunningTime = programEndTime - programStartTime;
+    std::chrono::duration<double, std::milli> milliTime = programRunningTime;
+    std::cout << "Running time of program: " << milliTime.count() << "\n";*/
+
+    //mean - Arithmetic Mean
+    //(v1 + v2 + v3 + ... + vn) / n
+    double meanDrawTime = 0.0;
+    for (double dTime : drawTimes)
+    {
+        meanDrawTime += dTime;
+    }
+    meanDrawTime /= drawTimes.size();
+
+    std::cout << "Mean Draw time: " << meanDrawTime << "ms \n";
+
+    std::fstream frameTimeLog{ "./frametime.csv", std::ios::out | std::ios::ate };
+    if (!frameTimeLog.is_open())
+    {
+        return -1;
+    }
+    for (std::size_t i = 0u; i < frameTimes.size(); ++i)
+    {
+        double fTime = frameTimes[i];
+        double dTime = drawTimes[i];
+        double ucTime = updateCritterTimes[i];
+        double colTime = collisionTimes[i];
+        frameTimeLog << fTime << "," << dTime 
+            << "," << ucTime << "," <<colTime << "\n";
+    }
 
     return 0;
 }
