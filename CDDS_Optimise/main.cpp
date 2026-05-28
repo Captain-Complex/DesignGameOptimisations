@@ -24,10 +24,12 @@
 #include "raylib.h"
 #include "raymath.h"
 
+#include <algorithm>
 #include <chrono>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <random>
 #include <vector>
 
