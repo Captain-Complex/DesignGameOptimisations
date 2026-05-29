@@ -288,6 +288,8 @@ int main(int argc, char* argv[])
     {
         return -1;
     }
+    frameTimeLog << "frametime, drawtime, crtupdate, crtcoll" << "\n";
+
     for (std::size_t i = 0u; i < frameTimes.size(); ++i)
     {
         double fTime = frameTimes[i];
