@@ -296,8 +296,8 @@ int main(int argc, char* argv[])
         double dTime = drawTimes[i];
         double ucTime = updateCritterTimes[i];
         double colTime = collisionTimes[i];
-        frameTimeLog << fTime << "," << dTime 
-            << "," << ucTime << "," <<colTime << "\n";
+        frameTimeLog << fTime << "," << dTime
+        << "," << ucTime << "," <<colTime << "\n";
     }
 
     return 0;
