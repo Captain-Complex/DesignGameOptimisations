@@ -168,13 +168,19 @@ int main(int argc, char* argv[])
 
         // check for critter-on-critter collisions
         for (int i = 0; i < CRITTER_COUNT; i++)
-        {            
-            for (int j = 0; j < CRITTER_COUNT; j++){
-                if (i == j || critters[i].IsDirty()) // note: the other critter (j) could be dirty - that's OK
+        {       
+            Vector2 v1 = critters[i].GetPosition();
+            for (int j = i + 1; j < CRITTER_COUNT; j++){
+                if (critters[i].IsDirty()) // note: the other critter (j) could be dirty - that's OK
                     continue;
                 // check every critter against every other critter
-                float dist = Vector2Distance(critters[i].GetPosition(), critters[j].GetPosition());
-                if (dist < critters[i].GetRadius() + critters[j].GetRadius())
+                Vector2 v2 = critters[j].GetPosition();
+                Vector2 diff = Vector2Subtract(v1, v2);
+                float distSqr = diff.x * diff.x + diff.y * diff.y;
+                float sumOfRadi = critters[i].GetRadius() + 
+                    critters[j].GetRadius();
+                //float dist = Vector2Distance(critters[i].GetPosition(), critters[j].GetPosition());
+                if (distSqr < sumOfRadi * sumOfRadi)
                 {
                     // collision!
                     // do math to get critters bouncing
@@ -274,14 +280,14 @@ int main(int argc, char* argv[])
 
     //mean - Arithmetic Mean
     //(v1 + v2 + v3 + ... + vn) / n
-    double meanDrawTime = 0.0;
-    for (double dTime : drawTimes)
+    double meanFrameTime = 0.0;
+    for (double fTime : frameTimes)
     {
-        meanDrawTime += dTime;
+        meanFrameTime += fTime;
     }
-    meanDrawTime /= drawTimes.size();
+    meanFrameTime /= frameTimes.size();
 
-    std::cout << "Mean Draw time: " << meanDrawTime << "ms \n";
+    std::cout << "Mean frame time: " << meanFrameTime << "ms \n";
 
     std::fstream frameTimeLog{ "./frametime.csv", std::ios::out | std::ios::ate };
     if (!frameTimeLog.is_open())
