@@ -41,9 +41,6 @@ int main(int argc, char* argv[])
 
     SetTraceLogLevel(LOG_ERROR);
 
-    /*Timer::time_point programStartTime = Timer::now();*/
-
-
     // Initialization
     //--------------------------------------------------------------------------------------
     int screenWidth = 1280;
@@ -100,8 +97,9 @@ int main(int argc, char* argv[])
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
         //----------------------------------------------------------------------------------
-
+        
         float delta = GetFrameTime();
+        int fps = GetFPS();
 
         // update the destroyer
         destroyer.Update(delta);
@@ -170,6 +168,7 @@ int main(int argc, char* argv[])
         for (int i = 0; i < CRITTER_COUNT; i++)
         {       
             Vector2 v1 = critters[i].GetPosition();
+            float c1Radus = critters[i].GetRadius();
             for (int j = i + 1; j < CRITTER_COUNT; j++){
                 if (critters[i].IsDirty()) // note: the other critter (j) could be dirty - that's OK
                     continue;
@@ -177,8 +176,7 @@ int main(int argc, char* argv[])
                 Vector2 v2 = critters[j].GetPosition();
                 Vector2 diff = Vector2Subtract(v1, v2);
                 float distSqr = diff.x * diff.x + diff.y * diff.y;
-                float sumOfRadi = critters[i].GetRadius() + 
-                    critters[j].GetRadius();
+                float sumOfRadi = c1Radus + critters[j].GetRadius();
                 //float dist = Vector2Distance(critters[i].GetPosition(), critters[j].GetPosition());
                 if (distSqr < sumOfRadi * sumOfRadi)
                 {
@@ -237,6 +235,8 @@ int main(int argc, char* argv[])
 
         ClearBackground(RAYWHITE);
 
+        
+
         // draw the critters
         for (int i = 0; i < CRITTER_COUNT; i++)
         {
@@ -246,15 +246,15 @@ int main(int argc, char* argv[])
         // (if you're wondering why it looks a little odd when sometimes critters are destroyed when they're not quite touching the 
         // destroyer, it's because the origin is at the top-left. ...you could fix that!)
         destroyer.Draw();
+        DrawText(TextFormat("%i FPS", fps), 10, 10, 20, RED);
 
-        DrawFPS(10, 10);
-        //DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-
-        EndDrawing();
         Timer::time_point drawEnd = Timer::now();
         Timer::duration drawTime = drawEnd - drawBegin;
         std::chrono::duration<double, std::milli> milliDraw = drawTime;
         drawTimes.push_back(milliDraw.count());
+
+        EndDrawing();
+        
         /*std::cout << "Draw time: " << milliTime.count() << "\n";*/
         //----------------------------------------------------------------------------------
         Timer::time_point frameEnd = Timer::now();
@@ -273,13 +273,6 @@ int main(int argc, char* argv[])
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
-   /* Timer::time_point programEndTime = Timer::now();
-    Timer::duration programRunningTime = programEndTime - programStartTime;
-    std::chrono::duration<double, std::milli> milliTime = programRunningTime;
-    std::cout << "Running time of program: " << milliTime.count() << "\n";*/
-
-    //mean - Arithmetic Mean
-    //(v1 + v2 + v3 + ... + vn) / n
     double meanFrameTime = 0.0;
     for (double fTime : frameTimes)
     {
