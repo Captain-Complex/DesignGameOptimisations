@@ -20,6 +20,7 @@
 ********************************************************************************************/
 
 #include "Critter.h"
+#include "DoubleLinkedList.hpp"
 
 #include "raylib.h"
 #include "raymath.h"

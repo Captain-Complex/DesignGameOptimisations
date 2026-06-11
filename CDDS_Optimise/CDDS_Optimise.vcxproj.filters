@@ -26,5 +26,8 @@
     <ClInclude Include="Critter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DoubleLinkedList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
