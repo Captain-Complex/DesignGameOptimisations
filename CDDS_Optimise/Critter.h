@@ -41,6 +41,8 @@ public:
 	void SetDirty() { m_isDirty = true; }
 
 	bool IsDead() { return m_isLoaded == false; }
+	int minColumnID;
+	int maxColumnID;
 
 };
 

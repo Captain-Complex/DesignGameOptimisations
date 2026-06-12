@@ -1,66 +1,87 @@
 #pragma once
 
-
-
 template<typename T>
-class Node
+struct Node
 {
 public:
 
-	//double linked list variables
+	//node variables
 	T data;
 	Node* prev = nullptr;
 	Node* next = nullptr;
 
-	//double linked list constructors
+	//node constructors
 	Node()
 	{
 		T data;
-		Node* prev = nullptr;
-		Node* next = nullptr;
+		prev = nullptr;
+		next = nullptr;
 	}
-	Node(T other)
+	Node(T value)
 	{
-		T data = other
-		Node* prev = nullptr;
-		Node* next = nullptr;
+		data(value);
+		prev = nullptr;
+		next = nullptr;
 	}
-	Node& Node(const Node&)
-	{
+	//node functions
 
-	}
-	~Node()
-	{
-
-	}
-	
 };
-template<typename Y>
-class DLinkList: public Node
+template<typename T>
+struct DLinkList: public Node<T>
 {
 public:
-	//double linked list functions
-	void PushBack(Y value)// adds node to the end
+	//double linked list variables
+	DLinkList* head = nullptr;
+	DLinkList* tail = nullptr;
+	int listSize[0];
+
+	//double linked list constructors
+	DLinkList()
 	{
-		if (Node.next = nullptr)
+		head = nullptr;
+		tail = nullptr;
+		listSize[0];
+	}
+	DLinkList(const DLinkList& other)
+	{
+		Node* temp = other.head;
+
+		while (temp != nullptr)
 		{
-			Node.prev->next;
-			Node.next->value;
+			this->PushBack(temp->data);
+			temp = temp->next;
 		}
 	}
-	void PopFront()//removes first node
+	//double linked list functions
+	void PushBack(T value) // add node to the end
 	{
-		if (Node.data != NULL)
+		Node* newNode = new Node(value);
+
+		if (tail == nullptr)
 		{
-			Y n = Node.data;
-			if (Node.next != nullptr)
+			head = newNode;
+			tail = newNode;
+		}
+		else
+		{
+			tail->next = newNode;
+			newNode->prev = tail;
+			tail = newNode;
+		}
+	}
+	void PopFront() // remove first node 
+	{
+		if (DLinkList::head != nullptr)
+		{
+			DLinkList* N = DLinkList::head;
+
+			if (DLinkList::head::next != nullptr)
 			{
-				Node.next->prev = nullptr;
-
+				DLinkList::head::next::prev = nullptr;
 			}
-			Node.data = Node.next;
-			delete n;
 
+            DLinkList::head = DLinkList::head::next;
+		    delete N;
 		}
 	}
 };

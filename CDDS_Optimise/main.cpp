@@ -31,6 +31,7 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <string>
 #include <random>
 #include <vector>
 
@@ -89,11 +90,20 @@ int main(int argc, char* argv[])
     std::vector<double> updateCritterTimes;
     std::vector<double> collisionTimes;
 
+    Timer::time_point frameBegin = Timer::now();
+
+    const int columnCount = 15;
+    const float columnWidth = screenWidth / columnCount;
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        Timer::time_point frameBegin = Timer::now();
+        Timer::time_point frameEnd = Timer::now();
+        Timer::duration frameTime = frameEnd - frameBegin;
+        frameBegin = frameEnd;
+        std::chrono::duration<double, std::milli> milliFrame = frameTime;
+        frameTimes.push_back(milliFrame.count());
+
         // Update
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
@@ -156,6 +166,10 @@ int main(int argc, char* argv[])
                 critters[i].Destroy();
                 // this would be the perfect time to put the critter into an object pool
             }
+            int ciMinColumn = static_cast<int>(critters[i].GetX() / columnWidth);
+            critters[i].minColumnID = ciMinColumn;
+            int ciMaxColumn = static_cast<int>(critters[i].GetX() + critters[i].GetRadius() * 2 / columnWidth);
+            critters[i].maxColumnID = ciMaxColumn;
         }
 
         Timer::time_point updateCritterEnd = Timer::now();
@@ -164,17 +178,24 @@ int main(int argc, char* argv[])
         updateCritterTimes.push_back(milliUpdateCritter.count());
 
         Timer::time_point collisionBegin = Timer::now();
-
+        
         // check for critter-on-critter collisions
         for (int i = 0; i < CRITTER_COUNT; i++)
         {       
             Vector2 v1 = critters[i].GetPosition();
             float c1Radus = critters[i].GetRadius();
+            int ciMinColumn = critters[i].minColumnID;
+            int ciMaxColumn = critters[i].maxColumnID;
             for (int j = i + 1; j < CRITTER_COUNT; j++){
-                if (critters[i].IsDirty()) // note: the other critter (j) could be dirty - that's OK
-                    continue;
+                
                 // check every critter against every other critter
                 Vector2 v2 = critters[j].GetPosition();
+                if (ciMinColumn != critters[j].minColumnID &&
+                    ciMinColumn > critters[j].maxColumnID &&
+                    ciMaxColumn < critters[j].minColumnID)
+                    continue;
+                if (critters[i].IsDirty()) // note: the other critter (j) could be dirty - that's OK
+                    continue;
                 Vector2 diff = Vector2Subtract(v1, v2);
                 float distSqr = diff.x * diff.x + diff.y * diff.y;
                 float sumOfRadi = c1Radus + critters[j].GetRadius();
@@ -249,6 +270,9 @@ int main(int argc, char* argv[])
         destroyer.Draw();
         DrawText(TextFormat("%i FPS", fps), 10, 10, 20, RED);
 
+        int destroyerColumn = static_cast<int>(destroyer.GetX() / columnWidth);
+         
+
         Timer::time_point drawEnd = Timer::now();
         Timer::duration drawTime = drawEnd - drawBegin;
         std::chrono::duration<double, std::milli> milliDraw = drawTime;
@@ -258,10 +282,7 @@ int main(int argc, char* argv[])
         
         /*std::cout << "Draw time: " << milliTime.count() << "\n";*/
         //----------------------------------------------------------------------------------
-        Timer::time_point frameEnd = Timer::now();
-        Timer::duration frameTime = frameEnd - frameBegin;
-        std::chrono::duration<double, std::milli> milliFrame = frameTime;
-        frameTimes.push_back(milliFrame.count());
+        
     }
 
     for (int i = 0; i < CRITTER_COUNT; i++)
