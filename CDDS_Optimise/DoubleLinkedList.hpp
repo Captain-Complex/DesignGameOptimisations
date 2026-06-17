@@ -1,5 +1,5 @@
 #pragma once
-
+#include <algorithm>
 template<typename T>
 struct Node
 {
@@ -13,34 +13,29 @@ public:
 	//node constructors
 	Node()
 	{
-		T data;
 		prev = nullptr;
 		next = nullptr;
 	}
-	Node(T value)
+	Node(T value):data(value)
 	{
-		data(value);
 		prev = nullptr;
 		next = nullptr;
 	}
-	//node functions
-
 };
 template<typename T>
-struct DLinkList: public Node<T>
+struct DLinkList
 {
 public:
 	//double linked list variables
-	DLinkList* head = nullptr;
-	DLinkList* tail = nullptr;
-	int listSize[0];
+	Node<T>* head = nullptr;
+	Node<T>* tail = nullptr;
+	int listSize = 0;
 
 	//double linked list constructors
 	DLinkList()
 	{
 		head = nullptr;
 		tail = nullptr;
-		listSize[0];
 	}
 	DLinkList(const DLinkList& other)
 	{
@@ -55,7 +50,7 @@ public:
 	//double linked list functions
 	void PushBack(T value) // add node to the end
 	{
-		Node* newNode = new Node(value);
+		Node<T>* newNode = new Node<T>(value);
 
 		if (tail == nullptr)
 		{
@@ -68,20 +63,24 @@ public:
 			newNode->prev = tail;
 			tail = newNode;
 		}
+		++listSize;
 	}
 	void PopFront() // remove first node 
 	{
-		if (DLinkList::head != nullptr)
+		if (head != nullptr)
 		{
-			DLinkList* N = DLinkList::head;
+			Node<T>* N = head;
 
-			if (DLinkList::head::next != nullptr)
+			if (head->next != nullptr)
 			{
-				DLinkList::head::next::prev = nullptr;
+				head->next->prev = nullptr;
 			}
 
-            DLinkList::head = DLinkList::head::next;
+            head = head->next;
 		    delete N;
 		}
+		--listSize;
 	}
+
+	
 };
