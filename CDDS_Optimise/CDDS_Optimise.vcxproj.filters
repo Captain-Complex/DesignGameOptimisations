@@ -29,5 +29,8 @@
     <ClInclude Include="DoubleLinkedList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SpacialGrid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

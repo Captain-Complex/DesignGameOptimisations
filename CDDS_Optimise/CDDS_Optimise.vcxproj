@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClInclude Include="Critter.h" />
     <ClInclude Include="DoubleLinkedList.hpp" />
+    <ClInclude Include="SpacialGrid.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

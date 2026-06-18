@@ -39,7 +39,7 @@ public:
 	}
 	DLinkList(const DLinkList& other)
 	{
-		Node* temp = other.head;
+		Node<T>* temp = other.head;
 
 		while (temp != nullptr)
 		{
@@ -67,7 +67,7 @@ public:
 	}
 	void PopFront() // remove first node 
 	{
-		if (head != nullptr)
+		/*if (head != nullptr)
 		{
 			Node<T>* N = head;
 
@@ -78,9 +78,46 @@ public:
 
             head = head->next;
 		    delete N;
-		}
-		--listSize;
+			--listSize;
+		}*/
+		Node<T>* front = head;
+		Erase(front);
 	}
-
+	void Erase(Node<T>* value)
+	{
+		if ( value->prev != nullptr && value->next != nullptr )
+		{
+			Node<T>* temp = value;
+			value->prev->next = value->next;
+			value->next->prev = value->prev;
+			value = value->next;
+			delete temp;
+			--listSize;
+			return;
+		}
+		if (value->prev != nullptr && value->next == nullptr)
+		{
+			Node<T>* temp = value;
+			value->prev->next = value->next;
+			value->prev = tail;
+			delete temp;
+			--listSize;
+			return;
+		}
+		if (value->prev == nullptr && value->next != nullptr)
+		{
+			Node<T>* temp = value;
+			value->next->prev = value->prev;
+			value->next = head;
+			delete temp;
+			--listSize;
+			return;
+		}
+		if (value->prev == nullptr && value->next == nullptr)
+		{
+			head = value->prev;
+			tail = value->next;
+		}
+	}
 	
 };
