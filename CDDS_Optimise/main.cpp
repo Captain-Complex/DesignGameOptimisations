@@ -136,24 +136,25 @@ int main(int argc, char* argv[])
 		// update the critters
 		// (dirty flags will be cleared during update)
 		//for (int i = 0; i < aliveCritters.listSize; i++)
-		for (Node<Critter*>* critter = aliveCritters.head; critter != nullptr; critter = critter->next)
+		for (Node<Critter*>* critter = aliveCritters.head; critter != nullptr;)
 		{
 			critter->data->Update(delta);
-
+			float cx = critter->data->GetX();
+			float cy = critter->data->GetY();
 			// check each critter against screen bounds
-			if (critter->data->GetX() < 0) {
+			if (cx < 0) {
 				critter->data->SetX(0);
 				critter->data->SetVelocity(Vector2{ -critter->data->GetVelocity().x, critter->data->GetVelocity().y });
 			}
-			if (critter->data->GetX() > screenWidth) {
+			if (cx > screenWidth) {
 				critter->data->SetX(screenWidth);
 				critter->data->SetVelocity(Vector2{ -critter->data->GetVelocity().x, critter->data->GetVelocity().y });
 			}
-			if (critter->data->GetY() < 0) {
+			if (cy < 0) {
 				critter->data->SetY(0);
 				critter->data->SetVelocity(Vector2{ critter->data->GetVelocity().x, -critter->data->GetVelocity().y });
 			}
-			if (critter->data->GetY() > screenHeight) {
+			if (cy > screenHeight) {
 				critter->data->SetY(screenHeight);
 				critter->data->SetVelocity(Vector2{ critter->data->GetVelocity().x, -critter->data->GetVelocity().y });
 			}
@@ -166,7 +167,9 @@ int main(int argc, char* argv[])
 				// this would be the perfect time to put the critter into an object pool
 				deadCritters.PushBack(critter->data);
 				critter->data->Destroy();
-				aliveCritters.Erase(critter);
+				Node<Critter*>* tempCritter = critter;
+				critter = critter->next;
+				aliveCritters.Erase(tempCritter);
 			}
 			else
 			{
@@ -175,6 +178,7 @@ int main(int argc, char* argv[])
 				int ciMaxColumn = static_cast<int>(critter->data->GetX() +
 					critter->data->GetRadius() * 2 / columnWidth);
 				critter->data->maxColumnID = ciMaxColumn;
+				critter = critter->next;
 			}
 
 		}

@@ -37,6 +37,13 @@ public:
 		head = nullptr;
 		tail = nullptr;
 	}
+	~DLinkList()
+	{
+		for (int i = 0; i < listSize; i++)
+		{
+			DLinkList::Erase(head);
+		}
+	}
 	DLinkList(const DLinkList& other)
 	{
 		Node<T>* temp = other.head;
@@ -67,6 +74,7 @@ public:
 	}
 	void PopFront() // remove first node 
 	{
+		//manual popFront but  may has issues
 		/*if (head != nullptr)
 		{
 			Node<T>* N = head;
@@ -80,8 +88,11 @@ public:
 		    delete N;
 			--listSize;
 		}*/
+		//taking advantage of Erase function for popFront
 		Node<T>* front = head;
-		Erase(front);
+		Node<T>* tempFront = front;
+		front = front->next;
+		Erase(tempFront);
 	}
 	void Erase(Node<T>* value)
 	{
@@ -90,7 +101,6 @@ public:
 			Node<T>* temp = value;
 			value->prev->next = value->next;
 			value->next->prev = value->prev;
-			value = value->next;
 			delete temp;
 			--listSize;
 			return;
@@ -99,7 +109,7 @@ public:
 		{
 			Node<T>* temp = value;
 			value->prev->next = value->next;
-			value->prev = tail;
+			tail = value->prev;
 			delete temp;
 			--listSize;
 			return;
@@ -108,7 +118,7 @@ public:
 		{
 			Node<T>* temp = value;
 			value->next->prev = value->prev;
-			value->next = head;
+			head = value->next;
 			delete temp;
 			--listSize;
 			return;
@@ -117,6 +127,9 @@ public:
 		{
 			head = value->prev;
 			tail = value->next;
+			delete value;
+			--listSize;
+			return;
 		}
 	}
 	
