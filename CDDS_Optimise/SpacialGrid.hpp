@@ -30,14 +30,19 @@ struct SpacialGrid
 	{
 		int minCol = static_cast<int>(x);
 		int maxCol = static_cast<int>(x + w);
-
-
-
+		maxCol = std::min(maxCol, cols - 1);
+		
 		int minRow = static_cast<int>(y);
 		int maxRow = static_cast<int>(y + h);
+		maxRow = std::min(maxRow, rows - 1);
 
-
-
+		for (int row = minRow; row <= maxRow; row++)
+		{
+			for (int col = minCol; col <= maxRow; col++)
+			{
+				cells = cells->PushBack(c);
+			}
+		}
 	}
 	void Clear()
 	{

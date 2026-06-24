@@ -74,20 +74,6 @@ public:
 	}
 	void PopFront() // remove first node 
 	{
-		//manual popFront but  may has issues
-		/*if (head != nullptr)
-		{
-			Node<T>* N = head;
-
-			if (head->next != nullptr)
-			{
-				head->next->prev = nullptr;
-			}
-
-            head = head->next;
-		    delete N;
-			--listSize;
-		}*/
 		//taking advantage of Erase function for popFront
 		Node<T>* front = head;
 		Node<T>* tempFront = front;

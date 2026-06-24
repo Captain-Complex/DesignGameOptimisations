@@ -95,9 +95,12 @@ int main(int argc, char* argv[])
 
 
 
-	const int columnCount = 15;
+	const int columnCount = 16;
 	const float columnWidth = screenWidth / columnCount;
-
+	const int rowCount = 9;
+	const float rowHeight = screenHeight / rowCount;
+	SpacialGrid<Critter*> grid{ rowCount,  columnCount, columnWidth, rowHeight };
+	
 	// Main game loop
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
@@ -191,6 +194,11 @@ int main(int argc, char* argv[])
 		Timer::time_point collisionBegin = Timer::now();
 
 		// check for critter-on-critter collisions
+		
+		/*
+		
+		*/
+
 		//for (int i = 0; i < aliveCritters.listSize; i++)
 		for (Node<Critter*>* critter = aliveCritters.head; critter != nullptr; critter = critter->next)
 		{
