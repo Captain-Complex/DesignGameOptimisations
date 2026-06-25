@@ -39,7 +39,8 @@ public:
 	}
 	~DLinkList()
 	{
-		for (int i = 0; i < listSize; i++)
+		int removeList = listSize;
+		for (int i = 0; i < removeList; i++)
 		{
 			DLinkList::Erase(head);
 		}
@@ -59,10 +60,12 @@ public:
 	{
 		Node<T>* newNode = new Node<T>(value);
 
-		if (tail == nullptr)
+		if (tail == nullptr /*&& head == nullptr*/)
 		{
 			head = newNode;
 			tail = newNode;
+			/*head->next = tail;
+			tail->prev = head;*/
 		}
 		else
 		{

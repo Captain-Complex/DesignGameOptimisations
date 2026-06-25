@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
 
 	srand(time(NULL));
 
-
 	Critter critters[1000];
 	DLinkList<Critter*> deadCritters{};
 	DLinkList<Critter*> aliveCritters{};
@@ -64,7 +63,6 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < CRITTER_COUNT; i++)
 	{
-
 		aliveCritters.PushBack(&critters[i]);
 
 		// create a random direction vector for the velocity
@@ -79,7 +77,6 @@ int main(int argc, char* argv[])
 			12, "res/10.png");
 	}
 
-
 	Critter destroyer;
 	Vector2 velocity = { -100 + (rand() % 200), -100 + (rand() % 200) };
 	velocity = Vector2Scale(Vector2Normalize(velocity), MAX_VELOCITY);
@@ -92,8 +89,6 @@ int main(int argc, char* argv[])
 	std::vector<double> frameTimes;
 	std::vector<double> updateCritterTimes;
 	std::vector<double> collisionTimes;
-
-
 
 	const int columnCount = 16;
 	const float columnWidth = screenWidth / columnCount;
@@ -193,58 +188,69 @@ int main(int argc, char* argv[])
 
 		Timer::time_point collisionBegin = Timer::now();
 
-		// check for critter-on-critter collisions
-		
-		/*
-		
-		*/
-
-		//for (int i = 0; i < aliveCritters.listSize; i++)
 		for (Node<Critter*>* critter = aliveCritters.head; critter != nullptr; critter = critter->next)
 		{
-			Vector2 v1 = critter->data->GetPosition();
-			float c1Radus = critter->data->GetRadius();
-			int ciMinColumn = critter->data->minColumnID;
-			int ciMaxColumn = critter->data->maxColumnID;
+			grid.Insert(critter->data->GetX(), critter->data->GetY(),
+				critter->data->GetRadius() * 2, critter->data->GetRadius() * 2, critters);
+		}
+		
+		// check for critter-on-critter collisions
 
-			//for (int j = i + 1; j < aliveCritters.listSize; j++)
-			for (Node<Critter*>* critterj = critter->next; critterj != nullptr; critterj = critterj->next)
+		//for (int i = 0; i < aliveCritters.listSize; i++)
+		for (int i = 0; i < grid.Size(); i++)
+		{
+			DLinkList<Critter*>& cellGrid = grid.cells[i];
+
+			for (Node<Critter*>* critter = cellGrid.head; critter != nullptr; critter = critter->next)
 			{
+				Vector2 v1 = critter->data->GetPosition();
+				float c1Radus = critter->data->GetRadius();
+				int ciMinColumn = critter->data->minColumnID;
+				int ciMaxColumn = critter->data->maxColumnID;
 
-				// check every critter against every other critter
-				Vector2 v2 = critterj->data->GetPosition();
-				if (ciMinColumn != critterj->data->minColumnID &&
-					ciMinColumn != critterj->data->maxColumnID &&
-					ciMaxColumn != critterj->data->minColumnID)
-					continue;
-				if (critter->data->IsDirty()) // note: the other critter (j) could be dirty - that's OK
-					continue;
-				Vector2 diff = Vector2Subtract(v1, v2);
-				float distSqr = diff.x * diff.x + diff.y * diff.y;
-				float sumOfRadi = c1Radus + critterj->data->GetRadius();
-				//float dist = Vector2Distance(critters[i].GetPosition(), critters[j].GetPosition());
-				if (distSqr < sumOfRadi * sumOfRadi)
+				//for (int j = i + 1; j < aliveCritters.listSize; j++)
+				for (Node<Critter*>* critterj = critter->next; critterj != nullptr; critterj = critterj->next)
 				{
-					// collision!
-					// do math to get critters bouncing
-					Vector2 normal = Vector2Normalize(Vector2Subtract(critterj->data->GetPosition(), critter->data->GetPosition()));
 
-					// not even close to real physics, but fine for our needs
-					critter->data->SetVelocity(Vector2Scale(normal, -MAX_VELOCITY));
-					// set the critter to *dirty* so we know not to process any more collisions on it
-					critter->data->SetDirty();
+					// check every critter against every other critter
+					Vector2 v2 = critterj->data->GetPosition();
+					/*if (ciMinColumn != critterj->data->minColumnID &&
+						ciMinColumn != critterj->data->maxColumnID &&
+						ciMaxColumn != critterj->data->minColumnID)
+						continue;*/
+					if (critter->data->IsDirty()) // note: the other critter (j) could be dirty - that's OK
+						continue;
+					Vector2 diff = Vector2Subtract(v1, v2);
+					float distSqr = diff.x * diff.x + diff.y * diff.y;
+					float sumOfRadi = c1Radus + critterj->data->GetRadius();
+					//float dist = Vector2Distance(critters[i].GetPosition(), critters[j].GetPosition());
+					if (distSqr < sumOfRadi * sumOfRadi)
+					{
+						if (diff.x == 0 && diff.y == 0)
+						{
+							continue;
+						}
+						// collision!
+						// do math to get critters bouncing
+						Vector2 normal = Vector2Normalize(Vector2Subtract(critterj->data->GetPosition(), critter->data->GetPosition()));
+                         
+						// not even close to real physics, but fine for our needs
+						critter->data->SetVelocity(Vector2Scale(normal, -MAX_VELOCITY));
+						// set the critter to *dirty* so we know not to process any more collisions on it
+						critter->data->SetDirty();
 
-					// we still want to check for collisions in the case where 1 critter is dirty - so we need a check 
-					// to make sure the other critter is clean before we do the collision response
-					if (!critterj->data->IsDirty()) {
-						critterj->data->SetVelocity(Vector2Scale(normal, MAX_VELOCITY));
-						critterj->data->SetDirty();
+						// we still want to check for collisions in the case where 1 critter is dirty - so we need a check 
+						// to make sure the other critter is clean before we do the collision response
+						if (!critterj->data->IsDirty()) {
+							critterj->data->SetVelocity(Vector2Scale(normal, MAX_VELOCITY));
+							critterj->data->SetDirty();
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}
-
+		grid.Clear();
 		Timer::time_point collisionEnd = Timer::now();
 		Timer::duration collisionTime = collisionEnd - collisionBegin;
 		std::chrono::duration<double, std::milli> milliCollision = collisionTime;
@@ -257,7 +263,6 @@ int main(int argc, char* argv[])
 
 			// find any dead critters and spit them out (respawn)
 			//for (int i = 0; i < deadCritters.listSize; i++)
-
 
 			if (deadCritters.listSize > 0)
 			{
@@ -284,8 +289,6 @@ int main(int argc, char* argv[])
 
 		ClearBackground(RAYWHITE);
 
-
-
 		// draw the critters
 		for (Node<Critter*>* critter = aliveCritters.head; critter != nullptr; critter = critter->next)
 		{
@@ -298,7 +301,6 @@ int main(int argc, char* argv[])
 		DrawText(TextFormat("%i FPS", fps), 10, 10, 20, RED);
 
 		int destroyerColumn = static_cast<int>(destroyer.GetX() / columnWidth);
-
 
 		Timer::time_point drawEnd = Timer::now();
 		Timer::duration drawTime = drawEnd - drawBegin;
@@ -320,8 +322,6 @@ int main(int argc, char* argv[])
 	{
 		critter->data->Destroy();
 	}
-
-
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------   

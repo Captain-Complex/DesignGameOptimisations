@@ -8,12 +8,12 @@
 template<typename T>
 struct SpacialGrid
 {
-	std::size_t rows, cols;
+	int rows, cols;
 	float cellWidth, cellHeight;
 
 	DLinkList<T>* cells;
 
-	SpacialGrid(std::size_t r, std::size_t c, float w, float h):
+	SpacialGrid(int r, int c, float w, float h):
 		rows(r), cols(c), cellWidth(w), cellHeight(h)
 	{
 		cells = new DLinkList<T>[rows * cols];
@@ -25,28 +25,29 @@ struct SpacialGrid
 	SpacialGrid(const SpacialGrid&) = delete;
 	SpacialGrid& operator=(const SpacialGrid&) = delete;
 
-
+	//[] for cells
 	void Insert(float x, float y, float w, float h, const T& c)
 	{
-		int minCol = static_cast<int>(x);
-		int maxCol = static_cast<int>(x + w);
+		int minCol = static_cast<int>(x) / cellWidth;
+		int maxCol = static_cast<int>(x + w) / cellWidth;
 		maxCol = std::min(maxCol, cols - 1);
 		
-		int minRow = static_cast<int>(y);
-		int maxRow = static_cast<int>(y + h);
+		int minRow = static_cast<int>(y) / cellHeight;
+		int maxRow = static_cast<int>(y + h) / cellHeight;
 		maxRow = std::min(maxRow, rows - 1);
 
 		for (int row = minRow; row <= maxRow; row++)
 		{
-			for (int col = minCol; col <= maxRow; col++)
+			for (int col = minCol; col <= maxCol; col++)
 			{
-				cells = cells->PushBack(c);
+				cells[row * cols + col].PushBack(c);
 			}
 		}
 	}
 	void Clear()
 	{
 		delete[] cells;
+		cells = new DLinkList<T>[rows * cols];
 	}
 	std::size_t Size() const
 	{
