@@ -133,7 +133,6 @@ int main(int argc, char* argv[])
 
 		// update the critters
 		// (dirty flags will be cleared during update)
-		//for (int i = 0; i < aliveCritters.listSize; i++)
 		for (Node<Critter*>* critter = aliveCritters.head; critter != nullptr;)
 		{
 			critter->data->Update(delta);
@@ -196,7 +195,6 @@ int main(int argc, char* argv[])
 		
 		// check for critter-on-critter collisions
 
-		//for (int i = 0; i < aliveCritters.listSize; i++)
 		for (int i = 0; i < grid.Size(); i++)
 		{
 			DLinkList<Critter*>& cellGrid = grid.cells[i];
@@ -208,16 +206,12 @@ int main(int argc, char* argv[])
 				int ciMinColumn = critter->data->minColumnID;
 				int ciMaxColumn = critter->data->maxColumnID;
 				
-				//for (int j = i + 1; j < aliveCritters.listSize; j++)
 				for (Node<Critter*>* critterj = critter->next; critterj != nullptr; critterj = critterj->next)
 				{
 
 					// check every critter against every other critter
 					Vector2 v2 = critterj->data->GetPosition();
-					/*if (ciMinColumn != critterj->data->minColumnID &&
-						ciMinColumn != critterj->data->maxColumnID &&
-						ciMaxColumn != critterj->data->minColumnID)
-						continue;*/
+					
 					if (critter->data->IsDirty()) // note: the other critter (j) could be dirty - that's OK
 						continue;
 					Vector2 diff = Vector2Subtract(v1, v2);
