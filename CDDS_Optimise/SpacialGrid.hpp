@@ -25,7 +25,8 @@ struct SpacialGrid
 	SpacialGrid(const SpacialGrid&) = delete;
 	SpacialGrid& operator=(const SpacialGrid&) = delete;
 
-	//[] for cells
+	//[] for cells if needed
+
 	void Insert(float x, float y, float w, float h, const T& c)
 	{
 		int minCol = static_cast<int>(x) / cellWidth;

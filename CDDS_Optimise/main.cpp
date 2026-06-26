@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
 		for (Node<Critter*>* critter = aliveCritters.head; critter != nullptr; critter = critter->next)
 		{
 			grid.Insert(critter->data->GetX(), critter->data->GetY(),
-				critter->data->GetRadius() * 2, critter->data->GetRadius() * 2, critters);
+				critter->data->GetRadius() * 2, critter->data->GetRadius() * 2, critter->data);
 		}
 		
 		// check for critter-on-critter collisions
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
 				float c1Radus = critter->data->GetRadius();
 				int ciMinColumn = critter->data->minColumnID;
 				int ciMaxColumn = critter->data->maxColumnID;
-
+				
 				//for (int j = i + 1; j < aliveCritters.listSize; j++)
 				for (Node<Critter*>* critterj = critter->next; critterj != nullptr; critterj = critterj->next)
 				{
